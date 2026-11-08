@@ -14,10 +14,11 @@ export async function login(formData: FormData): Promise<LoginResult> {
   const password = (formData.get("password") ?? "").toString();
   const next = (formData.get("next") ?? "").toString();
 
-  const hash = process.env.ADMIN_PASSWORD_HASH;
-  if (!hash) {
+  const encodedHash = process.env.ADMIN_PASSWORD_HASH;
+  if (!encodedHash) {
     return { error: "Server is not configured with ADMIN_PASSWORD_HASH." };
   }
+  const hash = Buffer.from(encodedHash, "base64").toString("utf8");
 
   const matches = password.length > 0 && (await bcrypt.compare(password, hash));
 
